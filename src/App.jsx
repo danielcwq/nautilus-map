@@ -44,7 +44,7 @@ function App() {
           Nautilus Map Viewer
         </h1>
         <p className="text-xl text-center mb-8 text-blue-600">
-          Find your friends!
+          Find your friends! Built with ❤️ by <a href="https://danielching.me" target="_blank" rel="noopener noreferrer" className="underline hover:text-blue-800">Daniel</a>
         </p>
         <div className="mb-6">
           <input

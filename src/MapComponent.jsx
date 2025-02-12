@@ -25,12 +25,12 @@ const MapComponent = ({ data, searchQuery }) => {
             location: `${item["Which city?"] || ''}, ${item["Which country are you based in right now?"] || ''}`
         });
     };
-    useEffect(() => {
-        if (data && data.length > 0) {
-            console.log("Sample data item:", data[0]);  // Add this line to see data structure
-            console.log("All data:", data);  // Add this to see all entries
-        }
-    }, [data]);
+    //useEffect(() => {
+    //    if (data && data.length > 0) {
+    //        console.log("Sample data item:", data[0]);  // Add this line to see data structure
+    //        console.log("All data:", data);  // Add this to see all entries
+    //    }
+    //}, [data]);
 
     useEffect(() => {
         if (searchQuery && searchQuery.length >= 3 && mapRef.current) {
@@ -73,9 +73,9 @@ const MapComponent = ({ data, searchQuery }) => {
         }
     }, [searchQuery, data]);
 
-    useEffect(() => {
-        console.log("Data received:", data);
-    }, [data]);
+    //useEffect(() => {
+    //    console.log("Data received:", data);
+    //}, [data]);
 
     useEffect(() => {
         if (!mapRef.current) {
