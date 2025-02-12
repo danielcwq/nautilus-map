@@ -39,11 +39,25 @@ const MapComponent = ({ data }) => {
             const lng = parseFloat(item.lng);
 
             if (!isNaN(lat) && !isNaN(lng)) {
+                // Format the URL to ensure it has http:// or https://
+                const formatUrl = (url) => {
+                    if (!url) return '';
+                    if (url.startsWith('http://') || url.startsWith('https://')) {
+                        return url;
+                    }
+                    return `https://${url}`;
+                };
+
+                const socialLink = formatUrl(item["1 social link (website / X / Insta / LinkedIn)"]);
+
                 const popupContent = `
-  <div>
-    <h3>${item.Name || 'Unknown'}</h3>
-    <p>Age: ${item.Age || 'N/A'}</p>
-    ${item["Which city?"] || item["city"] || item.location ?
+          <div>
+            <h3>${socialLink ?
+                        `<a href="${socialLink}" target="_blank" rel="noopener noreferrer" style="color: #3B82F6; text-decoration: underline;">${item.Name || 'Unknown'}</a>` :
+                        item.Name || 'Unknown'
+                    }</h3>
+            <p>Age: ${item.Age || 'N/A'}</p>
+            ${item["Which city?"] || item["city"] || item.location ?
                         `<p>Location: ${[
                             item["Which city?"] || item["city"],
                             item["Which state?"] || item["state"],
@@ -51,8 +65,8 @@ const MapComponent = ({ data }) => {
                         ].filter(Boolean).join(", ")}</p>`
                         : ''
                     }
-  </div>
-        `;
+          </div>
+                `;
 
                 L.marker([lat, lng])
                     .bindPopup(popupContent)
