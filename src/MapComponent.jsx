@@ -12,7 +12,14 @@ L.Icon.Default.mergeOptions({
 });
 
 const MapComponent = ({ data }) => {
+    const { trackEvent } = useAnalytics();
     const mapRef = useRef(null);
+    const handleMarkerClick = (item) => {
+        trackEvent('marker_clicked', {
+            user_name: item.Name,
+            location: `${item["Which city?"] || ''}, ${item["Which country are you based in right now?"] || ''}`
+        });
+    };
     useEffect(() => {
         console.log("Data received:", data);
     }, [data]);
@@ -70,6 +77,7 @@ const MapComponent = ({ data }) => {
 
                 L.marker([lat, lng])
                     .bindPopup(popupContent)
+                    .on('click', () => handleMarkerClick(item))
                     .addTo(markers);
             }
         });

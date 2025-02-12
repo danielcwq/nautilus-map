@@ -1,12 +1,19 @@
 import { useState, useEffect } from "react";
 import MapComponent from "./MapComponent";
+import { useAnalytics } from './hooks/useAnalytics';
 
 function App() {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const API_URL = import.meta.env.VITE_API_URL || '/api/sheet-data';
-
+  const { trackPageView, trackEvent } = useAnalytics();
+  useEffect(() => {
+    // Track page view when component mounts
+    trackPageView();
+    // Track custom event for map load
+    trackEvent('map_view_initialized');
+  }, []);
   useEffect(() => {
     const fetchData = async () => {
       try {
