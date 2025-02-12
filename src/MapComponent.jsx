@@ -14,9 +14,11 @@ L.Icon.Default.mergeOptions({
     shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
 });
 
-const MapComponent = ({ data }) => {
+const MapComponent = ({ data, searchQuery }) => {
     const { trackEvent } = useAnalytics();
     const mapRef = useRef(null);
+    const markersRef = useRef(null);
+
     const handleMarkerClick = (item) => {
         trackEvent('marker_clicked', {
             user_name: item.Name,
@@ -24,14 +26,76 @@ const MapComponent = ({ data }) => {
         });
     };
     useEffect(() => {
+        if (data && data.length > 0) {
+            console.log("Sample data item:", data[0]);  // Add this line to see data structure
+            console.log("All data:", data);  // Add this to see all entries
+        }
+    }, [data]);
+
+    useEffect(() => {
+        if (searchQuery && searchQuery.length >= 3 && mapRef.current) {
+            const searchTerm = searchQuery.toLowerCase();
+            console.log("Searching for:", searchTerm);
+
+            const matchingLocations = data.filter(item => {
+                const country = (item["Which country are you based in right now? "] || '').toLowerCase(); // Note the space at the end
+                const city = (item["Which city? "] || '').toLowerCase(); // Note the space at the end
+                const hasMatch = country.includes(searchTerm) || city.includes(searchTerm);
+
+                if (hasMatch) {
+                    console.log("Found match:", item);
+                }
+                return hasMatch;
+            });
+
+            if (matchingLocations.length > 0) {
+                const validLocations = matchingLocations.filter(item => {
+                    const lat = parseFloat(item.lat);
+                    const lng = parseFloat(item.lng);
+                    return !isNaN(lat) && !isNaN(lng);
+                });
+
+                if (validLocations.length > 0) {
+                    const bounds = L.latLngBounds(
+                        validLocations.map(item => [
+                            parseFloat(item.lat),
+                            parseFloat(item.lng)
+                        ])
+                    );
+                    mapRef.current.fitBounds(bounds, {
+                        padding: [50, 50],
+                        maxZoom: 6,  // Limit the maximum zoom level
+                        animate: true,
+                        duration: 1.5  // Animation duration in seconds
+                    });
+                }
+            }
+        }
+    }, [searchQuery, data]);
+
+    useEffect(() => {
         console.log("Data received:", data);
     }, [data]);
+
     useEffect(() => {
         if (!mapRef.current) {
-            mapRef.current = L.map("map").setView([0, 0], 2);
+            mapRef.current = L.map("map", {
+                maxBounds: [
+                    [-90, -180], // Southwest coordinates
+                    [90, 180]    // Northeast coordinates
+                ],
+                maxBoundsViscosity: 1.0,
+                minZoom: 2,
+                worldCopyJump: false
+            }).setView([0, 0], 2);
 
             L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
                 attribution: "© OpenStreetMap contributors",
+                noWrap: true,
+                bounds: [
+                    [-90, -180],
+                    [90, 180]
+                ]
             }).addTo(mapRef.current);
         }
 
