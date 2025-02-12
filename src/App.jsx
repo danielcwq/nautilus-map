@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import MapComponent from "./MapComponent";
-import { Analytics } from '@vercel/analytics'
 
 function App() {
   const [data, setData] = useState([]);
@@ -49,7 +48,6 @@ function App() {
           <MapComponent data={data} />
         </div>
       )}
-      <Analytics />
     </div>
   );
 }
