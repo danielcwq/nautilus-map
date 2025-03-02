@@ -73,9 +73,12 @@ const MapComponent = ({ data, searchQuery }) => {
         }
     }, [searchQuery, data]);
 
-    //useEffect(() => {
-    //    console.log("Data received:", data);
-    //}, [data]);
+    useEffect(() => {
+        if (data && data.length > 0) {
+            console.log("Sample data item:", data[0]);
+            console.log("Available columns:", Object.keys(data[0]));
+        }
+    }, [data]);
 
     useEffect(() => {
         if (!mapRef.current) {
@@ -111,7 +114,8 @@ const MapComponent = ({ data, searchQuery }) => {
         data.forEach((item) => {
             const lat = parseFloat(item.lat);
             const lng = parseFloat(item.lng);
-
+            console.log('Processing item:', item);
+            console.log('Coordinates:', { lat, lng });
             if (!isNaN(lat) && !isNaN(lng)) {
                 // Format the URL to ensure it has http:// or https://
                 const formatUrl = (url) => {
@@ -122,25 +126,50 @@ const MapComponent = ({ data, searchQuery }) => {
                     return `https://${url}`;
                 };
 
-                const socialLink = formatUrl(item["1 social link (website / X / Insta / LinkedIn)"]);
+                //const socialLink = formatUrl(item["1 social link (website / X / Insta / LinkedIn)"]);
+
+                // ... existing code ...
+
+                // ... existing code ...
 
                 const popupContent = `
-          <div>
-            <h3>${socialLink ?
-                        `<a href="${socialLink}" target="_blank" rel="noopener noreferrer" style="color: #3B82F6; text-decoration: underline;">${item.Name || 'Unknown'}</a>` :
-                        item.Name || 'Unknown'
+<div class="popup-content" style="min-width: 250px; padding: 8px;">
+  <h3 style="font-weight: bold; margin-bottom: 8px;">${(item["1 social link (website / X / Insta / LinkedIn)"] && item["1 social link (website / X / Insta / LinkedIn)"].trim()) ?
+                        `<a href="${formatUrl(item["1 social link (website / X / Insta / LinkedIn)"].trim())}" target="_blank" rel="noopener noreferrer" style="color: #3B82F6; text-decoration: underline;">${item["Name"]?.trim() || 'Unknown'}</a>` :
+                        item["Name"]?.trim() || 'Unknown'
                     }</h3>
-            <p>Age: ${item.Age || 'N/A'}</p>
-            ${item["Which city?"] || item["city"] || item.location ?
-                        `<p>Location: ${[
-                            item["Which city?"] || item["city"],
-                            item["Which state?"] || item["state"],
-                            item["Which country are you based in right now?"] || item["country"]
-                        ].filter(Boolean).join(", ")}</p>`
-                        : ''
+  ${(item["What's your discord username?"] && item["What's your discord username?"].trim()) ?
+                        `<p style="margin: 4px 0;"><span style="color: #5865F2;">Discord:</span> @${item["What's your discord username?"].trim()}</p>` :
+                        ''
                     }
-          </div>
-                `;
+  ${item["Age"] ? `<p style="margin: 4px 0;">Age: ${item["Age"]}</p>` : ''}
+  ${(() => {
+                        const location = [
+                            item["Which city?"]?.trim(),
+                            item["Which state?"]?.trim(),
+                            item["Which country are you based in right now?"]?.trim()
+                        ].filter(Boolean).join(", ");
+                        return location ? `<p style="margin: 4px 0;">Location: ${location}</p>` : '';
+                    })()}
+  ${(item["What’s one fun fact about you that might make someone want to reach out?"] &&
+                        item["What’s one fun fact about you that might make someone want to reach out?"].trim()) ?
+                        `<p style="margin: 8px 0;"><em>Fun fact: ${item["What’s one fun fact about you that might make someone want to reach out?"].trim()}</em></p>` :
+                        ''
+                    }
+</div>
+`;
+
+                // For debugging
+                console.log('Creating marker with data:', {
+                    name: item["Name"],
+                    discord: item["What's your discord username?"],
+                    age: item["Age"],
+                    city: item["Which city?"],
+                    state: item["Which state?"],
+                    country: item["Which country are you based in right now?"],
+                    funFact: item["What's one fun fact about you that might make someone want to reach out?"],
+                    socialLink: item["1 social link (website / X / Insta / LinkedIn)"]
+                });
 
                 L.marker([lat, lng])
                     .bindPopup(popupContent)

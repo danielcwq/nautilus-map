@@ -46,6 +46,9 @@ function App() {
         <p className="text-xl text-center mb-8 text-blue-600">
           Find your friends! Built with ❤️ by <a href="https://danielching.me" target="_blank" rel="noopener noreferrer" className="underline hover:text-blue-800">Daniel</a>
         </p>
+        <p className="text-xl text-center mb-8 text-blue-600">
+          We encourage you to reach out, but be careful!
+        </p>
         <div className="mb-6">
           <input
             type="text"
